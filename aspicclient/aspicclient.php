@@ -103,8 +103,7 @@ class AspicClient{
 	    
 	    SecureCookie::setSecureCookie(self::$serviceId, self::getCookieName(), $data['uid'], self::$privateKey, 0, '', '', false, null);
 	    
-	    var_dump(self::getCurrentUrl());
-	    //header('Location: '.self::getCurrentUrl());
+	    header('Location: '.self::getCurrentUrlWithoutArgs());
 	}
     }
     
@@ -161,17 +160,25 @@ class AspicClient{
     
     private static function getCurrentUrlWithoutArgs(){
 
-	$pageURL = 'http';
-	if (isset($_SERVER['https']) && $_SERVER["HTTPS"] == "on") {
-	    $pageURL .= "s";
+	$currentArgs = $_GET;
+	$currentUrl = self::getCurrentUrl();
+	
+	$currentUrlSeg = explode('?', $currentUrl);
+	$currentUrl = $currentUrlSeg[0];
+	
+	$first = true;
+	foreach ($currentArgs as $k => $v){
+	    if($k != 's' && $k != 'sid'){
+		if($first){
+		    $currentUrl .= '?'.$k.'='.$v;
+		    $first = false;
+		}else{
+		    $currentUrl .= '&'.$k.'='.$v;
+		}
+	    }
 	}
-	$pageURL .= "://";
-	if ($_SERVER["SERVER_PORT"] != "80") {
-	    $pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
-	} else {
-	    $pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
-	}
-	return $pageURL;
+	
+	return $currentUrl;
     }
 
 }
