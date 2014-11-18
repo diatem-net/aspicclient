@@ -2,6 +2,7 @@
 
 include 'aspicclient/aspicclient.php';
 
+//Commentaire
 AspicClient::init('172.31.6.52/aspicserver/', 'kapoue', '123', false);
 
 
