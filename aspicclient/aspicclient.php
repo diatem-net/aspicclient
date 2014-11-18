@@ -59,7 +59,7 @@ class AspicClient{
     
     public static function getUserGroups(){
 	self::getAuthDataFromServer();
-	return explode(',', self::$groups);
+	return self::$groups;
     }
     
     private static function checkReturn(){
