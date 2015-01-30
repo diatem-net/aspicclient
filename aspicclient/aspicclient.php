@@ -15,6 +15,7 @@ class AspicClient{
     private static $groups;
     private static $userData;
     private static $userId;
+    private static $extraArguments;
     
     private static $cookieName;
     private static $serverLoginUrl;
@@ -36,9 +37,9 @@ class AspicClient{
 	return self::getAuthDataFromServer();
     }
     
-    public static function login(){
+    public static function login($extraArguments = null){
 	if(!self::isAuthentified()){
-	    header('Location:'.self::getLoginServerUrl());   
+	    header('Location:'.self::getLoginServerUrl($extraArguments));   
 	}
     }
     
@@ -57,9 +58,14 @@ class AspicClient{
 	return self::$userData;
     }
     
+    public static function getExtraArguments(){
+	self::getAuthDataFromServer();
+	return self::$extraArguments;
+    }
+    
     public static function getUserGroups(){
 	self::getAuthDataFromServer();
-	return explode(',', self::$groups);
+	return self::$groups;
     }
     
     private static function checkReturn(){
@@ -118,6 +124,7 @@ class AspicClient{
 		self::$groups = $decryptedResults['groups'];
 		self::$userData = $decryptedResults['userData'];
 		self::$userId = $decryptedResults['userId'];
+		self::$extraArguments = $decryptedResults['extraArguments'];
 
 		self::$serverDataGetted = true;
 		
@@ -139,7 +146,7 @@ class AspicClient{
 	return self::$cookieName;
     }
     
-    private static function getLoginServerUrl(){
+    private static function getLoginServerUrl($extraArguments = null){
 	if(self::$serverLoginUrl){
 	    return self::$serverLoginUrl;
 	}
@@ -150,6 +157,14 @@ class AspicClient{
 	$secured = openssl_encrypt($secureString, self::$encryptMethod, self::$privateKey, false, self::$initializationVector);
 
 	$url .= '?sid='.self::$serviceId.'&s='.urlencode($secured);
+	
+	if($extraArguments){
+	    $extraString = json_encode($extraArguments);
+	    $extraSecured = openssl_encrypt($extraString, self::$encryptMethod, self::$privateKey, false, self::$initializationVector);
+	    $extraSecuredOut = openssl_decrypt($extraSecured, self::$encryptMethod, self::$privateKey, false, self::$initializationVector);
+
+	    $url .= '&e='.urlencode($extraSecured);
+	}
 	
 	self::$serverLoginUrl = $url;
 	

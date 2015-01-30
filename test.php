@@ -2,11 +2,12 @@
 
 include 'aspicclient/aspicclient.php';
 
+//Commentaire
 AspicClient::init('172.31.6.52/aspicserver/', 'kapoue', '123', false);
 
 
 if(isset($_GET['login'])){
-    AspicClient::login();
+    AspicClient::login(array('moi' => 'hop'));
 }
 
 if(isset($_GET['logout'])){
@@ -24,6 +25,7 @@ if($authentified){
     echo 'UserData : ';
     echo '<br>';
     var_dump(AspicClient::getUserData());
+    var_dump(AspicClient::getExtraArguments());
     echo '<br>';
     echo '<br>';
     echo '<a href="?logout">LOGOUT</a>';
